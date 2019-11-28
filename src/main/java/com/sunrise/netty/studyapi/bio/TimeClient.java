@@ -22,6 +22,9 @@ public class TimeClient {
             printWriter = new PrintWriter(socket.getOutputStream(), true);
 
             printWriter.println("query time order");
+            ////通过shutdownOutput高速服务器已经发送完数据，后续只能接受数据
+            //会让对方的socket 感知到EOF
+            socket.shutdownOutput();
             System.out.println("send order to server success");
             int c;
             StringBuilder stringBuilder = new StringBuilder();
