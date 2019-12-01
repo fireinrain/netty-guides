@@ -102,7 +102,7 @@ public class NioTimeHandler implements Runnable {
                         String body = new String(bytes, StandardCharsets.UTF_8);
                         System.out.println("Now is: " + body);
                         //读取到了服务端的数据，所以退出
-                        //this.stopFlag = true;
+                        this.stopFlag = true;
                     } else if (readData < 0) {
                         selectionKey.cancel();
                         channel.close();

@@ -128,6 +128,8 @@ public class SelectTimeServer implements Runnable {
         if (selectionKey.isWritable()) {
             ByteBuffer attachment = (ByteBuffer) selectionKey.attachment();
             //可能这个attach 并不存在
+            //如果一端的Socket被关闭（或主动关闭，或因为异常退出而 引起的关闭），
+            // 另一端仍发送数据，发送的第一个数据包引发该异常(Connect reset by peer)。
             if (attachment!=null){
                 attachment.flip();
                 SocketChannel clientChannel = (SocketChannel) selectionKey.channel();
