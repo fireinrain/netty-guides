@@ -34,10 +34,15 @@ public class NioTimeHandler implements Runnable {
             this.selector = selector;
             this.socketChannel = socketChannel;
             this.socketChannel.configureBlocking(false);
-            this.socketChannel.register(this.selector, SelectionKey.OP_CONNECT | SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+            this.socketChannel.register(this.selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
             this.socketChannel.connect(new InetSocketAddress(this.host, this.port));
+            while (!this.socketChannel.finishConnect()){
+                Thread.sleep(10);
+            }
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -72,28 +77,28 @@ public class NioTimeHandler implements Runnable {
         try {
             if (selectionKey.isValid()) {
                 //判断是否连接成功
-                if (selectionKey.isConnectable()) {
-                    SocketChannel channel = (SocketChannel) selectionKey.channel();
-                    //如果客户端完成了对服务端的连接
-                    if (channel.finishConnect()) {
-                        System.out.println("客户端连接成功：" + channel.getRemoteAddress());
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-                        byte[] bytes = "QUERY TIME ORDER".getBytes();
-                        byteBuffer.put(bytes);
-                        byteBuffer.flip();
-                        selectionKey.attach(byteBuffer);
-                        selectionKey.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
-                    }
-                }
+                //if (selectionKey.isConnectable()) {
+                //    SocketChannel channel = (SocketChannel) selectionKey.channel();
+                //    //如果客户端完成了对服务端的连接
+                //    if (channel.finishConnect()) {
+                //        System.out.println("客户端连接成功：" + channel.getRemoteAddress());
+                //        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+                //        byte[] bytes = "QUERY TIME ORDER".getBytes();
+                //        byteBuffer.put(bytes);
+                //        byteBuffer.flip();
+                //        selectionKey.attach(byteBuffer);
+                //        selectionKey.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                //    }
+                //}
                 //如果是可读状态
                 if (selectionKey.isReadable()) {
-                    SocketChannel channel = (SocketChannel)selectionKey.channel();
-                    ByteBuffer attachment = (ByteBuffer) selectionKey.attachment();
-                    int readData = channel.read(attachment);
+                    SocketChannel channel = (SocketChannel) selectionKey.channel();
+                    ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+                    int readData = channel.read(byteBuffer);
                     if (readData > 0) {
-                        attachment.flip();
-                        byte[] bytes = new byte[attachment.remaining()];
-                        attachment.get(bytes);
+                        byteBuffer.flip();
+                        byte[] bytes = new byte[byteBuffer.remaining()];
+                        byteBuffer.get(bytes);
                         String body = new String(bytes, StandardCharsets.UTF_8);
                         System.out.println("Now is: " + body);
                         //读取到了服务端的数据，所以退出
@@ -108,11 +113,11 @@ public class NioTimeHandler implements Runnable {
                 }
                 //如果是可写状态
                 if (selectionKey.isWritable()) {
-                    SocketChannel channel = (SocketChannel)selectionKey.channel();
-                    ByteBuffer attachment = (ByteBuffer) selectionKey.attachment();
+                    SocketChannel channel = (SocketChannel) selectionKey.channel();
+                    ByteBuffer byteBuffer = ByteBuffer.wrap("QUERY TIME ORDER".getBytes());
 
-                    channel.write(attachment);
-                    if (!attachment.hasRemaining()) {
+                    channel.write(byteBuffer);
+                    if (!byteBuffer.hasRemaining()) {
                         System.out.println("send order 2 server success!");
                     }
                     selectionKey.interestOps(SelectionKey.OP_READ);

@@ -127,17 +127,20 @@ public class SelectTimeServer implements Runnable {
         //如果可写
         if (selectionKey.isWritable()) {
             ByteBuffer attachment = (ByteBuffer) selectionKey.attachment();
-            attachment.flip();
-            SocketChannel clientChannel = (SocketChannel) selectionKey.channel();
-            try {
-                clientChannel.write(attachment);
-                clientChannel.close();
-            } catch (IOException e) {
-                selectionKey.cancel();
+            //可能这个attach 并不存在
+            if (attachment!=null){
+                attachment.flip();
+                SocketChannel clientChannel = (SocketChannel) selectionKey.channel();
                 try {
-                    selectionKey.channel().close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                    clientChannel.write(attachment);
+                    clientChannel.close();
+                } catch (IOException e) {
+                    selectionKey.cancel();
+                    try {
+                        selectionKey.channel().close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         }
