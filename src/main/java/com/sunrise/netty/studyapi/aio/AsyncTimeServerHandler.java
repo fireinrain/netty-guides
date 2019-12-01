@@ -14,59 +14,40 @@ import java.util.concurrent.CountDownLatch;
 public class AsyncTimeServerHandler implements Runnable {
     private int port;
 
-    private CountDownLatch countDownLatch;
-
-    private AsynchronousServerSocketChannel asynchronousServerSocketChannel;
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public CountDownLatch getCountDownLatch() {
-        return countDownLatch;
-    }
-
-    public void setCountDownLatch(CountDownLatch countDownLatch) {
-        this.countDownLatch = countDownLatch;
-    }
-
-    public AsynchronousServerSocketChannel getAsynchronousServerSocketChannel() {
-        return asynchronousServerSocketChannel;
-    }
-
-    public void setAsynchronousServerSocketChannel(AsynchronousServerSocketChannel asynchronousServerSocketChannel) {
-        this.asynchronousServerSocketChannel = asynchronousServerSocketChannel;
-    }
+    CountDownLatch latch;
+    AsynchronousServerSocketChannel asynchronousServerSocketChannel;
 
     public AsyncTimeServerHandler(int port) {
         this.port = port;
         try {
-            AsynchronousServerSocketChannel asynchronousServerSocketChannel = AsynchronousServerSocketChannel.open();
-            this.asynchronousServerSocketChannel = asynchronousServerSocketChannel;
-            this.asynchronousServerSocketChannel.bind(new InetSocketAddress(this.port));
+            asynchronousServerSocketChannel = AsynchronousServerSocketChannel
+                    .open();
+            asynchronousServerSocketChannel.bind(new InetSocketAddress(port));
+            System.out.println("The time server is start in port : " + port);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Runnable#run()
+     */
     @Override
     public void run() {
-        System.out.println("run...");
-        this.countDownLatch = new CountDownLatch(1);
+
+        latch = new CountDownLatch(1);
         doAccept();
         try {
-            countDownLatch.await();
+            latch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private void doAccept() {
-        System.out.println("server run: "+this.port);
-        this.asynchronousServerSocketChannel.accept(this,new AcceptCompleteHandler());
+    public void doAccept() {
+        asynchronousServerSocketChannel.accept(this,
+                new AcceptCompletionHandler());
     }
 }
