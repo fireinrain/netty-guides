@@ -1,0 +1,18 @@
+syntax = "proto3";
+package netty;
+
+option java_package = "com.sunrise.netty.studyapi.protobuf";
+option java_outer_classname = "SubscribeProto";
+
+message SubscribeReq{
+     int32 subscribeId = 1;
+     string userName = 2;
+     string productName = 3;
+     string address = 4;
+}
+
+message SubscribeRsp{
+    int32 subscribeId =1;
+    string statusCode = 2;
+    string desc = 3;
+}
