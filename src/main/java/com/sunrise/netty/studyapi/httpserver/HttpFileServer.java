@@ -21,7 +21,9 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * @date: 2019/12/10 9:50 PM
  */
 public class HttpFileServer {
-    private static final String DEFAULT_PATH = "/Users/sunrise/CodeGround/IdeaProjects/netty-guides/src/main/java/com/sunrise/netty/";
+    public static final String PATH_PREFIX= "/Users/sunrise/CodeGround/IdeaProjects/netty-guides/src/main/java";
+
+    private static final String DEFAULT_PATH = "/com/sunrise/netty/";
 
     private static final Integer port = 8888;
 
