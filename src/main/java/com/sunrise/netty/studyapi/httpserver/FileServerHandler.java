@@ -130,6 +130,10 @@ public class FileServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     private void setContentTypeHeader(HttpResponse response, File file) {
         MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+        //这种设置头，回以纯字符的形式展示文件内容
+        //response.headers().set(CONTENT_TYPE,
+        //        "text/html; charset=UTF-8");
+        //这样设置头 在macos下 访问具体文件回进行下载
         response.headers().set(CONTENT_TYPE,
                 mimeTypesMap.getContentType(file.getPath()));
     }
@@ -222,6 +226,15 @@ public class FileServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 + "\r\n", CharsetUtil.UTF_8));
         response.headers().set(CONTENT_TYPE, "text/plain; charset=UTF-8");
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
+        cause.printStackTrace();
+        if (ctx.channel().isActive()) {
+            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public static void main(String[] args) {
