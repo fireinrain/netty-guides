@@ -1,43 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Netty-websocket</title>
+  <meta charset="UTF-8">
+  <title>Netty-websocket</title>
 </head>
 <body>
 <div>
-客户端：<input type="text" id="myinput">
-    <button onclick="sendMessage">发送</button>
-    <button onclick="connectServer">连接</button>
-    <button onclick="disconnectServer">断开</button>
+  客户端：<input type="text" id="myinput">
+  <button onclick="sendMessage()">发送</button>
+  <button onclick="connectServer()">连接</button>
+  <button onclick="disconnectServer()">断开</button>
 </div>
+<span id="status">Wait for connect</span>
 
 <div id="server" style="margin-top: 50px">
-    服务端：
-    <textarea name="servermessage" id="" cols="100" rows="30">
+  服务端：
+  <textarea name="servermessage" id="servermessage" cols="100" rows="30">
 
     </textarea>
 </div>
 
-<script>
-    function sendMessage() {
-        //判断是否连接服务端
-        
-        //获取input值
-        
-        //发送input值
-        
-        //清空input值
+
+<script type="text/javascript">
+  let websocket = null;
+  let isConnenct = false;
+
+  function sendMessage() {
+    //判断是否连接服务端
+    if (!isConnenct) {
+      alert("还未链接websocket服务端！！！");
+      return;
+    }
+    //获取input值
+    let inputValue = document.getElementById("myinput").value;
+    if (inputValue === "") {
+      return;
+    } else {
+      websocket.send(inputValue);
+    }
+    //发送input值
+    //清空input值
+    inputValue = "";
+  }
+
+  function connectServer() {
+    //连接服务端
+    websocket = new WebSocket("ws://localhost:8888");
+    websocket.onopen = function (e) {
+      isConnenct = true;
+      //设置span标签的值
+      let statusNode = document.getElementById("status");
+      statusNode.innerText = "Connected!"
+    };
+
+    websocket.onmessage = function (e) {
+      let data = e.data;
+      let messageContainer = document.getElementById("servermessage");
+      let temp  = messageContainer.innerHTML;
+      messageContainer.innerHTML = temp+data+"&#10";
     }
 
-    function connectServer() {
-        //连接服务端
-    }
+  }
 
-    function disconnectServer() {
-        //断开连接
-
-    }
+  function disconnectServer() {
+    //断开连接
+    websocket.close();
+    isConnenct = false;
+      //设置span标签的值
+      let statusNode = document.getElementById("status");
+      statusNode.innerText = "Wait for connect!"
+  }
 
 </script>
 </body>
