@@ -16,7 +16,7 @@ public class MarshallingDecoder {
     private final Unmarshaller unmarshaller;
 
     public MarshallingDecoder() throws IOException {
-        this.unmarshaller = MarshallingCodecFactory.buildUnMarshalling();
+        unmarshaller = MarshallingCodecFactory.buildUnMarshalling();
     }
 
     protected Object decode(ByteBuf in) throws Exception{

@@ -48,7 +48,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
                 }
 
             }
-            System.out.println("The login response is : " + loginRsp
+            System.out.println("###：The login response is : " + loginRsp
                     + " body [" + loginRsp.getBody() + "]");
             ctx.writeAndFlush(loginRsp);
         } else {
@@ -69,6 +69,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         //删除出现异常的ip
         nodeCheck.remove(ctx.channel().remoteAddress().toString());
+        System.out.println("--->: 移除掉线客户端ip");
         ctx.close();
         ctx.fireExceptionCaught(cause);
     }

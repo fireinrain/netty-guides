@@ -36,7 +36,7 @@ public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter {
                 //握手失败,连接关闭
                 ctx.close();
             } else {
-                System.out.println("Login is ok: " + nettyMessage);
+                System.out.println("####： Login is ok: " + nettyMessage);
                 ctx.fireChannelRead(msg);
             }
         }else {
